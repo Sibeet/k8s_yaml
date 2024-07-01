@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: grafana
+  namespace: grafana
+spec:
+  serviceName: "grafana"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      #initContainers:
+      #- name: fix-permission
+      #  image: busybox
+      #  command: ['sh', '-c', 'chown -R 472:472 /var/lib/grafana']
+      # volumeMounts:
+      #  - name: grafana-storage
+      #    mountPath: /var/lib/grafana
+      containers:
+      - name: grafana
+        image: grafana/grafana:latest
+        env:
+        - name: GF_INSTALL_PLUGINS
+          value: "grafana-opensearch-datasource"
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+        - name: grafana-storage
+          mountPath: /var/lib/grafana
+  volumeClaimTemplates:
+  - metadata:
+      name: grafana-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: nfs-client
+      resources:
+        requests:
+          storage: 10Gi

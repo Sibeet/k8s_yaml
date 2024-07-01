@@ -1,0 +1,14 @@
+# Source: logstash-meta/templates/configmap-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-config
+  namespace: npension
+  labels:
+    app: "release-name-logstash"
+    chart: "logstash"
+    heritage: "Helm"
+    release: "release-name"
+data:
+  topic-contrabass.yml: |
+    http.host: "0.0.0.0"

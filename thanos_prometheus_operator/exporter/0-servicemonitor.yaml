@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: exporter
+  namespace: thanos
+  labels:
+    prometheus: main
+spec:
+  selector:
+    matchLabels:
+      monitor: exporter
+  namespaceSelector:
+    matchNames:
+    - kube-system
+    - thanos
+  endpoints:
+  - port: http  

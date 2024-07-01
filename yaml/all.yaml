@@ -1,0 +1,3161 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2024-05-27T03:39:15Z"
+    generateName: airflow-postgresql-
+    labels:
+      app.kubernetes.io/component: primary
+      app.kubernetes.io/instance: airflow
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/version: 16.1.0
+      apps.kubernetes.io/pod-index: "0"
+      controller-revision-hash: airflow-postgresql-59f5bcc96d
+      helm.sh/chart: postgresql-13.2.24
+      statefulset.kubernetes.io/pod-name: airflow-postgresql-0
+    name: airflow-postgresql-0
+    namespace: airflow
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: StatefulSet
+      name: airflow-postgresql
+      uid: e80d93d3-a412-439a-ac8c-955061e4d6b3
+    resourceVersion: "16572051"
+    uid: da392bd3-22ea-4b59-8373-577a15e45e6e
+  spec:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/component: primary
+                app.kubernetes.io/instance: airflow
+                app.kubernetes.io/name: postgresql
+            topologyKey: kubernetes.io/hostname
+          weight: 1
+    containers:
+    - env:
+      - name: BITNAMI_DEBUG
+        value: "false"
+      - name: POSTGRESQL_PORT_NUMBER
+        value: "5432"
+      - name: POSTGRESQL_VOLUME_DIR
+        value: /bitnami/postgresql
+      - name: PGDATA
+        value: /bitnami/postgresql/data
+      - name: POSTGRES_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: postgres-password
+            name: airflow-postgresql
+      - name: POSTGRESQL_ENABLE_LDAP
+        value: "no"
+      - name: POSTGRESQL_ENABLE_TLS
+        value: "no"
+      - name: POSTGRESQL_LOG_HOSTNAME
+        value: "false"
+      - name: POSTGRESQL_LOG_CONNECTIONS
+        value: "false"
+      - name: POSTGRESQL_LOG_DISCONNECTIONS
+        value: "false"
+      - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
+        value: "off"
+      - name: POSTGRESQL_CLIENT_MIN_MESSAGES
+        value: error
+      - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
+        value: pgaudit
+      image: docker.io/bitnami/postgresql:16.1.0-debian-11-r15
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        exec:
+          command:
+          - /bin/sh
+          - -c
+          - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+        failureThreshold: 6
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      name: postgresql
+      ports:
+      - containerPort: 5432
+        name: tcp-postgresql
+        protocol: TCP
+      readinessProbe:
+        exec:
+          command:
+          - /bin/sh
+          - -c
+          - -e
+          - |
+            exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+            [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+        failureThreshold: 6
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources:
+        requests:
+          cpu: 250m
+          memory: 256Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        privileged: false
+        readOnlyRootFilesystem: false
+        runAsNonRoot: true
+        runAsUser: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /dev/shm
+        name: dshm
+      - mountPath: /bitnami/postgresql
+        name: data
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-hpwk2
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    hostname: airflow-postgresql-0
+    nodeName: vmware-k8s1-node-3
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 1001
+    serviceAccount: default
+    serviceAccountName: default
+    subdomain: airflow-postgresql-hl
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: data-airflow-postgresql-0
+    - emptyDir:
+        medium: Memory
+      name: dshm
+    - name: kube-api-access-hpwk2
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-27T03:39:15Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-29T02:56:58Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-29T02:56:58Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-27T03:39:15Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://eca8fbb888edee686e106122c93b2ecd8202fc900d1fc637e922f4484374929e
+      image: docker.io/bitnami/postgresql:16.1.0-debian-11-r15
+      imageID: docker.io/bitnami/postgresql@sha256:29e3dd0e7e7a740eabdbae6f82673507d180701a719bbdb6d6308a58cf723e64
+      lastState:
+        terminated:
+          containerID: containerd://ef07f12688dbd5ad0aa2370bdf78a20769d9f40b14b9808fc5d31846ce43d004
+          exitCode: 137
+          finishedAt: "2024-05-29T02:56:52Z"
+          reason: Error
+          startedAt: "2024-05-27T05:21:37Z"
+      name: postgresql
+      ready: true
+      restartCount: 2
+      started: true
+      state:
+        running:
+          startedAt: "2024-05-29T02:56:53Z"
+    hostIP: 172.10.40.8
+    phase: Running
+    podIP: 10.244.3.63
+    podIPs:
+    - ip: 10.244.3.63
+    qosClass: Burstable
+    startTime: "2024-05-27T03:39:15Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      checksum/airflow-config: a10719d9a45aa4eda8692b8e125a56e47f48ed38be9d374ade58ddb39a0ef611
+      checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
+      checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
+      checksum/metadata-secret: 1527346545415bf13f4c9ad69470086eb90d854f2b83594d78ec1badb5e13eb0
+      checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
+      checksum/result-backend-secret: 98a68f230007cfa8f5d3792e1aff843a76b0686409e4a46ab2f092f6865a1b71
+      cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    creationTimestamp: "2024-05-27T03:46:46Z"
+    generateName: airflow-scheduler-6d5d6cd4bf-
+    labels:
+      component: scheduler
+      pod-template-hash: 6d5d6cd4bf
+      release: airflow
+      tier: airflow
+    name: airflow-scheduler-6d5d6cd4bf-jr54l
+    namespace: airflow
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: airflow-scheduler-6d5d6cd4bf
+      uid: 2b762959-37c0-4a75-b234-029288e4fca7
+    resourceVersion: "16572093"
+    uid: f41ba06c-b646-4ad0-b972-1993313ebab5
+  spec:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                component: scheduler
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+    containers:
+    - args:
+      - bash
+      - -c
+      - exec airflow scheduler
+      env:
+      - name: AIRFLOW__CORE__FERNET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: fernet-key
+            name: airflow-fernet-key
+      - name: AIRFLOW_HOME
+        value: /opt/airflow
+      - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW_CONN_AIRFLOW_DB
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW__WEBSERVER__SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: webserver-secret-key
+            name: airflow-webserver-secret-key
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        exec:
+          command:
+          - sh
+          - -c
+          - |
+            CONNECTION_CHECK_MAX_COUNT=0 AIRFLOW__LOGGING__LOGGING_LEVEL=ERROR exec /entrypoint \
+            airflow jobs check --job-type SchedulerJob --local
+        failureThreshold: 5
+        initialDelaySeconds: 10
+        periodSeconds: 60
+        successThreshold: 1
+        timeoutSeconds: 20
+      name: scheduler
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+      startupProbe:
+        exec:
+          command:
+          - sh
+          - -c
+          - |
+            CONNECTION_CHECK_MAX_COUNT=0 AIRFLOW__LOGGING__LOGGING_LEVEL=ERROR exec /entrypoint \
+            airflow jobs check --job-type SchedulerJob --local
+        failureThreshold: 6
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 20
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
+        name: config
+        readOnly: true
+        subPath: pod_template_file.yaml
+      - mountPath: /opt/airflow/logs
+        name: logs
+      - mountPath: /opt/airflow/airflow.cfg
+        name: config
+        readOnly: true
+        subPath: airflow.cfg
+      - mountPath: /opt/airflow/config/airflow_local_settings.py
+        name: config
+        readOnly: true
+        subPath: airflow_local_settings.py
+      - mountPath: /opt/airflow/dags
+        name: dags
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-9vpk8
+        readOnly: true
+    - args:
+      - bash
+      - /clean-logs
+      env:
+      - name: AIRFLOW__LOG_RETENTION_DAYS
+        value: "15"
+      - name: AIRFLOW_HOME
+        value: /opt/airflow
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imagePullPolicy: IfNotPresent
+      name: scheduler-log-groomer
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /opt/airflow/logs
+        name: logs
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-9vpk8
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    initContainers:
+    - args:
+      - airflow
+      - db
+      - check-migrations
+      - --migration-wait-timeout=60
+      env:
+      - name: AIRFLOW__CORE__FERNET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: fernet-key
+            name: airflow-fernet-key
+      - name: AIRFLOW_HOME
+        value: /opt/airflow
+      - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW_CONN_AIRFLOW_DB
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW__WEBSERVER__SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: webserver-secret-key
+            name: airflow-webserver-secret-key
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imagePullPolicy: IfNotPresent
+      name: wait-for-airflow-migrations
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /opt/airflow/airflow.cfg
+        name: config
+        readOnly: true
+        subPath: airflow.cfg
+      - mountPath: /opt/airflow/config/airflow_local_settings.py
+        name: config
+        readOnly: true
+        subPath: airflow_local_settings.py
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-9vpk8
+        readOnly: true
+    nodeName: vmware-k8s1-node-3
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 0
+      runAsUser: 50000
+    serviceAccount: airflow-scheduler
+    serviceAccountName: airflow-scheduler
+    terminationGracePeriodSeconds: 10
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        name: airflow-config
+      name: config
+    - name: dags
+      persistentVolumeClaim:
+        claimName: airflow-dags
+    - name: logs
+      persistentVolumeClaim:
+        claimName: airflow-logs
+    - name: kube-api-access-9vpk8
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-27T03:47:29Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-29T02:57:11Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-29T02:57:11Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-27T03:46:47Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://0e7a42e42be9111f8b9cde5e783a8d8adcfeba40defdfcac142792b984c85671
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imageID: 172.10.40.178:31130/airflow_src/airflow@sha256:f92b9818cd67ad15ac2dcbb4622f8ab0f85637f93b4e3d944d8e7e05f438de1f
+      lastState:
+        terminated:
+          containerID: containerd://7db11ebdd0a164b7dfdfdab204a0f58755f16265535c7784ed248c7457d7beba
+          exitCode: 1
+          finishedAt: "2024-05-29T02:56:28Z"
+          reason: Error
+          startedAt: "2024-05-28T03:24:30Z"
+      name: scheduler
+      ready: true
+      restartCount: 10
+      started: true
+      state:
+        running:
+          startedAt: "2024-05-29T02:56:29Z"
+    - containerID: containerd://a8a908dc31aa5fe8a5808cb299f6fb228a48c96e904cb2ff77691bde5d24c3cc
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imageID: 172.10.40.178:31130/airflow_src/airflow@sha256:f92b9818cd67ad15ac2dcbb4622f8ab0f85637f93b4e3d944d8e7e05f438de1f
+      lastState: {}
+      name: scheduler-log-groomer
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2024-05-27T03:47:30Z"
+    hostIP: 172.10.40.8
+    initContainerStatuses:
+    - containerID: containerd://a55aaaf82541c036ebc604a3a0919e0f1450a9474948760ec33e52cbb9435ce7
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imageID: 172.10.40.178:31130/airflow_src/airflow@sha256:f92b9818cd67ad15ac2dcbb4622f8ab0f85637f93b4e3d944d8e7e05f438de1f
+      lastState: {}
+      name: wait-for-airflow-migrations
+      ready: true
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          containerID: containerd://a55aaaf82541c036ebc604a3a0919e0f1450a9474948760ec33e52cbb9435ce7
+          exitCode: 0
+          finishedAt: "2024-05-27T03:47:23Z"
+          reason: Completed
+          startedAt: "2024-05-27T03:46:57Z"
+    phase: Running
+    podIP: 10.244.3.88
+    podIPs:
+    - ip: 10.244.3.88
+    qosClass: BestEffort
+    startTime: "2024-05-27T03:46:47Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    creationTimestamp: "2024-05-27T03:46:46Z"
+    generateName: airflow-statsd-5667dd85ff-
+    labels:
+      component: statsd
+      pod-template-hash: 5667dd85ff
+      release: airflow
+      tier: airflow
+    name: airflow-statsd-5667dd85ff-f467s
+    namespace: airflow
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: airflow-statsd-5667dd85ff
+      uid: d0435bf1-882e-4a0d-a4e9-1e67d7582fcf
+    resourceVersion: "16334798"
+    uid: 6fdc2b1c-197c-4ca0-9125-bd0c1c4c13f4
+  spec:
+    affinity: {}
+    containers:
+    - args:
+      - --statsd.mapping-config=/etc/statsd-exporter/mappings.yml
+      image: quay.io/prometheus/statsd-exporter:v0.26.0
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /metrics
+          port: 9102
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      name: statsd
+      ports:
+      - containerPort: 9125
+        name: statsd-ingest
+        protocol: UDP
+      - containerPort: 9102
+        name: statsd-scrape
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /metrics
+          port: 9102
+          scheme: HTTP
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /etc/statsd-exporter/mappings.yml
+        name: config
+        subPath: mappings.yml
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-bptz6
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: vmware-k8s1-node-3
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      runAsUser: 65534
+    serviceAccount: airflow-statsd
+    serviceAccountName: airflow-statsd
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        name: airflow-statsd
+      name: config
+    - name: kube-api-access-bptz6
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-27T03:46:46Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-28T03:24:18Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-28T03:24:18Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-27T03:46:46Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://43526d2a8954d53b0600e9fa587ddf010f919c586aa1e02df7fe77ca1aa2cf5f
+      image: quay.io/prometheus/statsd-exporter:v0.26.0
+      imageID: quay.io/prometheus/statsd-exporter@sha256:a3924f9429c8237293336ff40c5a246238ff9f64aaf712521b2d29f45d6214d5
+      lastState: {}
+      name: statsd
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2024-05-27T03:46:56Z"
+    hostIP: 172.10.40.8
+    phase: Running
+    podIP: 10.244.3.83
+    podIPs:
+    - ip: 10.244.3.83
+    qosClass: BestEffort
+    startTime: "2024-05-27T03:46:46Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      checksum/airflow-config: a10719d9a45aa4eda8692b8e125a56e47f48ed38be9d374ade58ddb39a0ef611
+      checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
+      checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
+      checksum/metadata-secret: 1527346545415bf13f4c9ad69470086eb90d854f2b83594d78ec1badb5e13eb0
+      checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
+      cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    creationTimestamp: "2024-05-28T03:36:25Z"
+    generateName: airflow-triggerer-
+    labels:
+      apps.kubernetes.io/pod-index: "0"
+      component: triggerer
+      controller-revision-hash: airflow-triggerer-79766475d
+      release: airflow
+      statefulset.kubernetes.io/pod-name: airflow-triggerer-0
+      tier: airflow
+    name: airflow-triggerer-0
+    namespace: airflow
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: StatefulSet
+      name: airflow-triggerer
+      uid: e0b62411-e494-4e89-89f3-cdccd2b2743e
+    resourceVersion: "16572046"
+    uid: 82337032-7c98-4349-a63a-8dce931fd46a
+  spec:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                component: triggerer
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+    containers:
+    - args:
+      - bash
+      - -c
+      - exec airflow triggerer
+      env:
+      - name: AIRFLOW__CORE__FERNET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: fernet-key
+            name: airflow-fernet-key
+      - name: AIRFLOW_HOME
+        value: /opt/airflow
+      - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW_CONN_AIRFLOW_DB
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW__WEBSERVER__SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: webserver-secret-key
+            name: airflow-webserver-secret-key
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        exec:
+          command:
+          - sh
+          - -c
+          - |
+            CONNECTION_CHECK_MAX_COUNT=0 AIRFLOW__LOGGING__LOGGING_LEVEL=ERROR exec /entrypoint \
+            airflow jobs check --job-type TriggererJob --local
+        failureThreshold: 5
+        initialDelaySeconds: 10
+        periodSeconds: 60
+        successThreshold: 1
+        timeoutSeconds: 20
+      name: triggerer
+      ports:
+      - containerPort: 8794
+        name: triggerer-logs
+        protocol: TCP
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /opt/airflow/logs
+        name: logs
+      - mountPath: /opt/airflow/airflow.cfg
+        name: config
+        readOnly: true
+        subPath: airflow.cfg
+      - mountPath: /opt/airflow/config/airflow_local_settings.py
+        name: config
+        readOnly: true
+        subPath: airflow_local_settings.py
+      - mountPath: /opt/airflow/dags
+        name: dags
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-w82fr
+        readOnly: true
+    - args:
+      - bash
+      - /clean-logs
+      env:
+      - name: AIRFLOW__LOG_RETENTION_DAYS
+        value: "15"
+      - name: AIRFLOW_HOME
+        value: /opt/airflow
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imagePullPolicy: IfNotPresent
+      name: triggerer-log-groomer
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /opt/airflow/logs
+        name: logs
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-w82fr
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    hostname: airflow-triggerer-0
+    initContainers:
+    - args:
+      - airflow
+      - db
+      - check-migrations
+      - --migration-wait-timeout=60
+      env:
+      - name: AIRFLOW__CORE__FERNET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: fernet-key
+            name: airflow-fernet-key
+      - name: AIRFLOW_HOME
+        value: /opt/airflow
+      - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW_CONN_AIRFLOW_DB
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW__WEBSERVER__SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: webserver-secret-key
+            name: airflow-webserver-secret-key
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imagePullPolicy: IfNotPresent
+      name: wait-for-airflow-migrations
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /opt/airflow/airflow.cfg
+        name: config
+        readOnly: true
+        subPath: airflow.cfg
+      - mountPath: /opt/airflow/config/airflow_local_settings.py
+        name: config
+        readOnly: true
+        subPath: airflow_local_settings.py
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-w82fr
+        readOnly: true
+    nodeName: vmware-k8s1-node-2
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 0
+      runAsUser: 50000
+    serviceAccount: airflow-triggerer
+    serviceAccountName: airflow-triggerer
+    subdomain: airflow-triggerer
+    terminationGracePeriodSeconds: 60
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        name: airflow-config
+      name: config
+    - name: dags
+      persistentVolumeClaim:
+        claimName: airflow-dags
+    - name: logs
+      persistentVolumeClaim:
+        claimName: airflow-logs
+    - name: kube-api-access-w82fr
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-28T03:36:41Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-29T02:56:57Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-29T02:56:57Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-28T03:36:25Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://d5fd5a52de4adb38e6ed09acf08f54a3028b9ecb509d46cd8e8a50ffcdd9eb16
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imageID: 172.10.40.178:31130/airflow_src/airflow@sha256:f92b9818cd67ad15ac2dcbb4622f8ab0f85637f93b4e3d944d8e7e05f438de1f
+      lastState:
+        terminated:
+          containerID: containerd://75cb9a19022644fcf3af7d317d58452bb116a4afa528df4d7698e2adac2d5bc9
+          exitCode: 1
+          finishedAt: "2024-05-29T02:56:55Z"
+          reason: Error
+          startedAt: "2024-05-28T03:36:41Z"
+      name: triggerer
+      ready: true
+      restartCount: 1
+      started: true
+      state:
+        running:
+          startedAt: "2024-05-29T02:56:57Z"
+    - containerID: containerd://6cc3fd81f00bf69e139c4d10deb32335004857757ac38254447daed5c22e8830
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imageID: 172.10.40.178:31130/airflow_src/airflow@sha256:f92b9818cd67ad15ac2dcbb4622f8ab0f85637f93b4e3d944d8e7e05f438de1f
+      lastState: {}
+      name: triggerer-log-groomer
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: "2024-05-28T03:36:41Z"
+    hostIP: 172.10.40.130
+    initContainerStatuses:
+    - containerID: containerd://db26e62e4b530728f5f75331f68169bc883f3734773065bbfbd74d79ef016e3b
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imageID: 172.10.40.178:31130/airflow_src/airflow@sha256:f92b9818cd67ad15ac2dcbb4622f8ab0f85637f93b4e3d944d8e7e05f438de1f
+      lastState: {}
+      name: wait-for-airflow-migrations
+      ready: true
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          containerID: containerd://db26e62e4b530728f5f75331f68169bc883f3734773065bbfbd74d79ef016e3b
+          exitCode: 0
+          finishedAt: "2024-05-28T03:36:40Z"
+          reason: Completed
+          startedAt: "2024-05-28T03:36:27Z"
+    phase: Running
+    podIP: 10.244.2.235
+    podIPs:
+    - ip: 10.244.2.235
+    qosClass: BestEffort
+    startTime: "2024-05-28T03:36:25Z"
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      checksum/airflow-config: a10719d9a45aa4eda8692b8e125a56e47f48ed38be9d374ade58ddb39a0ef611
+      checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
+      checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
+      checksum/metadata-secret: 1527346545415bf13f4c9ad69470086eb90d854f2b83594d78ec1badb5e13eb0
+      checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
+      checksum/webserver-config: 2f3fdfd294a37094d2abee43b2b09888a5c195ee03414996bf99a4681658af94
+      checksum/webserver-secret-key: 468eda248041191a251689c78ff9c1693ba840f5799dc03dae2c9245bf3da1be
+    creationTimestamp: "2024-05-27T03:46:46Z"
+    generateName: airflow-webserver-79f4b5d484-
+    labels:
+      component: webserver
+      pod-template-hash: 79f4b5d484
+      release: airflow
+      tier: airflow
+    name: airflow-webserver-79f4b5d484-9j7pt
+    namespace: airflow
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: airflow-webserver-79f4b5d484
+      uid: db55936d-db59-4377-9566-69ee435365ab
+    resourceVersion: "16572134"
+    uid: 6e779426-b4a6-4643-a576-c9460ba7ce4f
+  spec:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                component: webserver
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+    containers:
+    - args:
+      - bash
+      - -c
+      - exec airflow webserver
+      env:
+      - name: AIRFLOW__CORE__FERNET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: fernet-key
+            name: airflow-fernet-key
+      - name: AIRFLOW_HOME
+        value: /opt/airflow
+      - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW_CONN_AIRFLOW_DB
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW__WEBSERVER__SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: webserver-secret-key
+            name: airflow-webserver-secret-key
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        failureThreshold: 5
+        httpGet:
+          path: /health
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 15
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      name: webserver
+      ports:
+      - containerPort: 8080
+        name: airflow-ui
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 5
+        httpGet:
+          path: /health
+          port: 8080
+          scheme: HTTP
+        initialDelaySeconds: 15
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+      startupProbe:
+        failureThreshold: 6
+        httpGet:
+          path: /health
+          port: 8080
+          scheme: HTTP
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 20
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
+        name: config
+        readOnly: true
+        subPath: pod_template_file.yaml
+      - mountPath: /opt/airflow/airflow.cfg
+        name: config
+        readOnly: true
+        subPath: airflow.cfg
+      - mountPath: /opt/airflow/config/airflow_local_settings.py
+        name: config
+        readOnly: true
+        subPath: airflow_local_settings.py
+      - mountPath: /opt/airflow/logs
+        name: logs
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-gwr9j
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    initContainers:
+    - args:
+      - airflow
+      - db
+      - check-migrations
+      - --migration-wait-timeout=60
+      env:
+      - name: AIRFLOW__CORE__FERNET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: fernet-key
+            name: airflow-fernet-key
+      - name: AIRFLOW_HOME
+        value: /opt/airflow
+      - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW_CONN_AIRFLOW_DB
+        valueFrom:
+          secretKeyRef:
+            key: connection
+            name: airflow-metadata
+      - name: AIRFLOW__WEBSERVER__SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: webserver-secret-key
+            name: airflow-webserver-secret-key
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imagePullPolicy: IfNotPresent
+      name: wait-for-airflow-migrations
+      resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /opt/airflow/airflow.cfg
+        name: config
+        readOnly: true
+        subPath: airflow.cfg
+      - mountPath: /opt/airflow/config/airflow_local_settings.py
+        name: config
+        readOnly: true
+        subPath: airflow_local_settings.py
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-gwr9j
+        readOnly: true
+    nodeName: vmware-k8s1-node-3
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 0
+      runAsUser: 50000
+    serviceAccount: airflow-webserver
+    serviceAccountName: airflow-webserver
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - configMap:
+        defaultMode: 420
+        name: airflow-config
+      name: config
+    - name: logs
+      persistentVolumeClaim:
+        claimName: airflow-logs
+    - name: kube-api-access-gwr9j
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-27T03:47:29Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-29T02:57:28Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-29T02:57:28Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2024-05-27T03:46:46Z"
+      status: "True"
+      type: PodScheduled
+    containerStatuses:
+    - containerID: containerd://45d34b545619298710d45f6ab96605b300114eb3e3fe99dd9b498850be45d033
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imageID: 172.10.40.178:31130/airflow_src/airflow@sha256:f92b9818cd67ad15ac2dcbb4622f8ab0f85637f93b4e3d944d8e7e05f438de1f
+      lastState:
+        terminated:
+          containerID: containerd://1ab94bce7bbe6a9449e7a4f470671a1994a4d9e24a3d7ae5f635ede5aa57285a
+          exitCode: 0
+          finishedAt: "2024-05-29T02:56:32Z"
+          reason: Completed
+          startedAt: "2024-05-28T03:24:31Z"
+      name: webserver
+      ready: true
+      restartCount: 7
+      started: true
+      state:
+        running:
+          startedAt: "2024-05-29T02:56:33Z"
+    hostIP: 172.10.40.8
+    initContainerStatuses:
+    - containerID: containerd://347d41bc83252f71e32a8a32f7dfcae1122b01eef6e905211f0dc12e70595a0e
+      image: 172.10.40.178:31130/airflow_src/airflow:1.0
+      imageID: 172.10.40.178:31130/airflow_src/airflow@sha256:f92b9818cd67ad15ac2dcbb4622f8ab0f85637f93b4e3d944d8e7e05f438de1f
+      lastState: {}
+      name: wait-for-airflow-migrations
+      ready: true
+      restartCount: 0
+      started: false
+      state:
+        terminated:
+          containerID: containerd://347d41bc83252f71e32a8a32f7dfcae1122b01eef6e905211f0dc12e70595a0e
+          exitCode: 0
+          finishedAt: "2024-05-27T03:47:23Z"
+          reason: Completed
+          startedAt: "2024-05-27T03:46:56Z"
+    phase: Running
+    podIP: 10.244.3.79
+    podIPs:
+    - ip: 10.244.3.79
+    qosClass: BestEffort
+    startTime: "2024-05-27T03:46:46Z"
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/component: primary
+      app.kubernetes.io/instance: airflow
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/version: 16.1.0
+      helm.sh/chart: postgresql-13.2.24
+    name: airflow-postgresql
+    namespace: airflow
+    resourceVersion: "14942357"
+    uid: cf0c0857-c328-4382-91cf-971d20749a07
+  spec:
+    clusterIP: 10.105.202.181
+    clusterIPs:
+    - 10.105.202.181
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: tcp-postgresql
+      port: 5432
+      protocol: TCP
+      targetPort: tcp-postgresql
+    selector:
+      app.kubernetes.io/component: primary
+      app.kubernetes.io/instance: airflow
+      app.kubernetes.io/name: postgresql
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+      service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/component: primary
+      app.kubernetes.io/instance: airflow
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/version: 16.1.0
+      helm.sh/chart: postgresql-13.2.24
+    name: airflow-postgresql-hl
+    namespace: airflow
+    resourceVersion: "14942343"
+    uid: 3c0f9638-f4dd-4b7e-ae84-31796f22075a
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: tcp-postgresql
+      port: 5432
+      protocol: TCP
+      targetPort: tcp-postgresql
+    publishNotReadyAddresses: true
+    selector:
+      app.kubernetes.io/component: primary
+      app.kubernetes.io/instance: airflow
+      app.kubernetes.io/name: postgresql
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+      prometheus.io/port: "9102"
+      prometheus.io/scrape: "true"
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: statsd
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-statsd
+    namespace: airflow
+    resourceVersion: "14942369"
+    uid: b68bebee-366c-41e5-ae68-01f767986ec8
+  spec:
+    clusterIP: 10.104.186.97
+    clusterIPs:
+    - 10.104.186.97
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: statsd-ingest
+      port: 9125
+      protocol: UDP
+      targetPort: 9125
+    - name: statsd-scrape
+      port: 9102
+      protocol: TCP
+      targetPort: 9102
+    selector:
+      component: statsd
+      release: airflow
+      tier: airflow
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: triggerer
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-triggerer
+    namespace: airflow
+    resourceVersion: "14942344"
+    uid: baeb7720-e1f7-4f2b-be91-56e076b79732
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: triggerer-logs
+      port: 8794
+      protocol: TCP
+      targetPort: 8794
+    selector:
+      component: triggerer
+      release: airflow
+      tier: airflow
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: webserver
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-webserver
+    namespace: airflow
+    resourceVersion: "14942359"
+    uid: 76eb72c0-3f01-4d33-9158-5469b2928621
+  spec:
+    clusterIP: 10.109.42.55
+    clusterIPs:
+    - 10.109.42.55
+    externalTrafficPolicy: Cluster
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: airflow-ui
+      nodePort: 31151
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      component: webserver
+      release: airflow
+      tier: airflow
+    sessionAffinity: None
+    type: NodePort
+  status:
+    loadBalancer: {}
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: scheduler
+      executor: KubernetesExecutor
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-scheduler
+    namespace: airflow
+    resourceVersion: "16572095"
+    uid: 7b0cbe89-2570-458d-bdc1-bc84eff9cde0
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        component: scheduler
+        release: airflow
+        tier: airflow
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          checksum/airflow-config: a10719d9a45aa4eda8692b8e125a56e47f48ed38be9d374ade58ddb39a0ef611
+          checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
+          checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
+          checksum/metadata-secret: 1527346545415bf13f4c9ad69470086eb90d854f2b83594d78ec1badb5e13eb0
+          checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
+          checksum/result-backend-secret: 98a68f230007cfa8f5d3792e1aff843a76b0686409e4a46ab2f092f6865a1b71
+          cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        creationTimestamp: null
+        labels:
+          component: scheduler
+          release: airflow
+          tier: airflow
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    component: scheduler
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - args:
+          - bash
+          - -c
+          - exec airflow scheduler
+          env:
+          - name: AIRFLOW__CORE__FERNET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: fernet-key
+                name: airflow-fernet-key
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW_CONN_AIRFLOW_DB
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__WEBSERVER__SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: webserver-secret-key
+                name: airflow-webserver-secret-key
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - |
+                CONNECTION_CHECK_MAX_COUNT=0 AIRFLOW__LOGGING__LOGGING_LEVEL=ERROR exec /entrypoint \
+                airflow jobs check --job-type SchedulerJob --local
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 20
+          name: scheduler
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          startupProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - |
+                CONNECTION_CHECK_MAX_COUNT=0 AIRFLOW__LOGGING__LOGGING_LEVEL=ERROR exec /entrypoint \
+                airflow jobs check --job-type SchedulerJob --local
+            failureThreshold: 6
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 20
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
+            name: config
+            readOnly: true
+            subPath: pod_template_file.yaml
+          - mountPath: /opt/airflow/logs
+            name: logs
+          - mountPath: /opt/airflow/airflow.cfg
+            name: config
+            readOnly: true
+            subPath: airflow.cfg
+          - mountPath: /opt/airflow/config/airflow_local_settings.py
+            name: config
+            readOnly: true
+            subPath: airflow_local_settings.py
+          - mountPath: /opt/airflow/dags
+            name: dags
+        - args:
+          - bash
+          - /clean-logs
+          env:
+          - name: AIRFLOW__LOG_RETENTION_DAYS
+            value: "15"
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          name: scheduler-log-groomer
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/logs
+            name: logs
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - airflow
+          - db
+          - check-migrations
+          - --migration-wait-timeout=60
+          env:
+          - name: AIRFLOW__CORE__FERNET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: fernet-key
+                name: airflow-fernet-key
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW_CONN_AIRFLOW_DB
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__WEBSERVER__SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: webserver-secret-key
+                name: airflow-webserver-secret-key
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          name: wait-for-airflow-migrations
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/airflow.cfg
+            name: config
+            readOnly: true
+            subPath: airflow.cfg
+          - mountPath: /opt/airflow/config/airflow_local_settings.py
+            name: config
+            readOnly: true
+            subPath: airflow_local_settings.py
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 0
+          runAsUser: 50000
+        serviceAccount: airflow-scheduler
+        serviceAccountName: airflow-scheduler
+        terminationGracePeriodSeconds: 10
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: airflow-config
+          name: config
+        - name: dags
+          persistentVolumeClaim:
+            claimName: airflow-dags
+        - name: logs
+          persistentVolumeClaim:
+            claimName: airflow-logs
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-05-22T07:36:11Z"
+      lastUpdateTime: "2024-05-22T07:37:14Z"
+      message: ReplicaSet "airflow-scheduler-6d5d6cd4bf" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2024-05-29T02:57:11Z"
+      lastUpdateTime: "2024-05-29T02:57:11Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: statsd
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-statsd
+    namespace: airflow
+    resourceVersion: "16283262"
+    uid: 431e9738-b37b-4297-b642-e7e92370a685
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        component: statsd
+        release: airflow
+        tier: airflow
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          component: statsd
+          release: airflow
+          tier: airflow
+      spec:
+        affinity: {}
+        containers:
+        - args:
+          - --statsd.mapping-config=/etc/statsd-exporter/mappings.yml
+          image: quay.io/prometheus/statsd-exporter:v0.26.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /metrics
+              port: 9102
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: statsd
+          ports:
+          - containerPort: 9125
+            name: statsd-ingest
+            protocol: UDP
+          - containerPort: 9102
+            name: statsd-scrape
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /metrics
+              port: 9102
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/statsd-exporter/mappings.yml
+            name: config
+            subPath: mappings.yml
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsUser: 65534
+        serviceAccount: airflow-statsd
+        serviceAccountName: airflow-statsd
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: airflow-statsd
+          name: config
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-05-22T07:36:11Z"
+      lastUpdateTime: "2024-05-22T07:36:31Z"
+      message: ReplicaSet "airflow-statsd-5667dd85ff" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2024-05-27T03:47:07Z"
+      lastUpdateTime: "2024-05-27T03:47:07Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: webserver
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-webserver
+    namespace: airflow
+    resourceVersion: "16572138"
+    uid: 373e845d-69a4-4027-bbcf-98c1fe29e146
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        component: webserver
+        release: airflow
+        tier: airflow
+    strategy:
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          checksum/airflow-config: a10719d9a45aa4eda8692b8e125a56e47f48ed38be9d374ade58ddb39a0ef611
+          checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
+          checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
+          checksum/metadata-secret: 1527346545415bf13f4c9ad69470086eb90d854f2b83594d78ec1badb5e13eb0
+          checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
+          checksum/webserver-config: 2f3fdfd294a37094d2abee43b2b09888a5c195ee03414996bf99a4681658af94
+          checksum/webserver-secret-key: 468eda248041191a251689c78ff9c1693ba840f5799dc03dae2c9245bf3da1be
+        creationTimestamp: null
+        labels:
+          component: webserver
+          release: airflow
+          tier: airflow
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    component: webserver
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - args:
+          - bash
+          - -c
+          - exec airflow webserver
+          env:
+          - name: AIRFLOW__CORE__FERNET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: fernet-key
+                name: airflow-fernet-key
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW_CONN_AIRFLOW_DB
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__WEBSERVER__SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: webserver-secret-key
+                name: airflow-webserver-secret-key
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: webserver
+          ports:
+          - containerPort: 8080
+            name: airflow-ui
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          startupProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 20
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
+            name: config
+            readOnly: true
+            subPath: pod_template_file.yaml
+          - mountPath: /opt/airflow/airflow.cfg
+            name: config
+            readOnly: true
+            subPath: airflow.cfg
+          - mountPath: /opt/airflow/config/airflow_local_settings.py
+            name: config
+            readOnly: true
+            subPath: airflow_local_settings.py
+          - mountPath: /opt/airflow/logs
+            name: logs
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - airflow
+          - db
+          - check-migrations
+          - --migration-wait-timeout=60
+          env:
+          - name: AIRFLOW__CORE__FERNET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: fernet-key
+                name: airflow-fernet-key
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW_CONN_AIRFLOW_DB
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__WEBSERVER__SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: webserver-secret-key
+                name: airflow-webserver-secret-key
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          name: wait-for-airflow-migrations
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/airflow.cfg
+            name: config
+            readOnly: true
+            subPath: airflow.cfg
+          - mountPath: /opt/airflow/config/airflow_local_settings.py
+            name: config
+            readOnly: true
+            subPath: airflow_local_settings.py
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 0
+          runAsUser: 50000
+        serviceAccount: airflow-webserver
+        serviceAccountName: airflow-webserver
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: airflow-config
+          name: config
+        - name: logs
+          persistentVolumeClaim:
+            claimName: airflow-logs
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2024-05-22T07:36:11Z"
+      lastUpdateTime: "2024-05-22T07:37:31Z"
+      message: ReplicaSet "airflow-webserver-79f4b5d484" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2024-05-29T02:57:28Z"
+      lastUpdateTime: "2024-05-29T02:57:28Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    generation: 1
+    labels:
+      component: scheduler
+      pod-template-hash: 6d5d6cd4bf
+      release: airflow
+      tier: airflow
+    name: airflow-scheduler-6d5d6cd4bf
+    namespace: airflow
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: airflow-scheduler
+      uid: 7b0cbe89-2570-458d-bdc1-bc84eff9cde0
+    resourceVersion: "16572094"
+    uid: 2b762959-37c0-4a75-b234-029288e4fca7
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        component: scheduler
+        pod-template-hash: 6d5d6cd4bf
+        release: airflow
+        tier: airflow
+    template:
+      metadata:
+        annotations:
+          checksum/airflow-config: a10719d9a45aa4eda8692b8e125a56e47f48ed38be9d374ade58ddb39a0ef611
+          checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
+          checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
+          checksum/metadata-secret: 1527346545415bf13f4c9ad69470086eb90d854f2b83594d78ec1badb5e13eb0
+          checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
+          checksum/result-backend-secret: 98a68f230007cfa8f5d3792e1aff843a76b0686409e4a46ab2f092f6865a1b71
+          cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        creationTimestamp: null
+        labels:
+          component: scheduler
+          pod-template-hash: 6d5d6cd4bf
+          release: airflow
+          tier: airflow
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    component: scheduler
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - args:
+          - bash
+          - -c
+          - exec airflow scheduler
+          env:
+          - name: AIRFLOW__CORE__FERNET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: fernet-key
+                name: airflow-fernet-key
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW_CONN_AIRFLOW_DB
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__WEBSERVER__SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: webserver-secret-key
+                name: airflow-webserver-secret-key
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - |
+                CONNECTION_CHECK_MAX_COUNT=0 AIRFLOW__LOGGING__LOGGING_LEVEL=ERROR exec /entrypoint \
+                airflow jobs check --job-type SchedulerJob --local
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 20
+          name: scheduler
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          startupProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - |
+                CONNECTION_CHECK_MAX_COUNT=0 AIRFLOW__LOGGING__LOGGING_LEVEL=ERROR exec /entrypoint \
+                airflow jobs check --job-type SchedulerJob --local
+            failureThreshold: 6
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 20
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
+            name: config
+            readOnly: true
+            subPath: pod_template_file.yaml
+          - mountPath: /opt/airflow/logs
+            name: logs
+          - mountPath: /opt/airflow/airflow.cfg
+            name: config
+            readOnly: true
+            subPath: airflow.cfg
+          - mountPath: /opt/airflow/config/airflow_local_settings.py
+            name: config
+            readOnly: true
+            subPath: airflow_local_settings.py
+          - mountPath: /opt/airflow/dags
+            name: dags
+        - args:
+          - bash
+          - /clean-logs
+          env:
+          - name: AIRFLOW__LOG_RETENTION_DAYS
+            value: "15"
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          name: scheduler-log-groomer
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/logs
+            name: logs
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - airflow
+          - db
+          - check-migrations
+          - --migration-wait-timeout=60
+          env:
+          - name: AIRFLOW__CORE__FERNET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: fernet-key
+                name: airflow-fernet-key
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW_CONN_AIRFLOW_DB
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__WEBSERVER__SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: webserver-secret-key
+                name: airflow-webserver-secret-key
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          name: wait-for-airflow-migrations
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/airflow.cfg
+            name: config
+            readOnly: true
+            subPath: airflow.cfg
+          - mountPath: /opt/airflow/config/airflow_local_settings.py
+            name: config
+            readOnly: true
+            subPath: airflow_local_settings.py
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 0
+          runAsUser: 50000
+        serviceAccount: airflow-scheduler
+        serviceAccountName: airflow-scheduler
+        terminationGracePeriodSeconds: 10
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: airflow-config
+          name: config
+        - name: dags
+          persistentVolumeClaim:
+            claimName: airflow-dags
+        - name: logs
+          persistentVolumeClaim:
+            claimName: airflow-logs
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    generation: 1
+    labels:
+      component: statsd
+      pod-template-hash: 5667dd85ff
+      release: airflow
+      tier: airflow
+    name: airflow-statsd-5667dd85ff
+    namespace: airflow
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: airflow-statsd
+      uid: 431e9738-b37b-4297-b642-e7e92370a685
+    resourceVersion: "16283260"
+    uid: d0435bf1-882e-4a0d-a4e9-1e67d7582fcf
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        component: statsd
+        pod-template-hash: 5667dd85ff
+        release: airflow
+        tier: airflow
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          component: statsd
+          pod-template-hash: 5667dd85ff
+          release: airflow
+          tier: airflow
+      spec:
+        affinity: {}
+        containers:
+        - args:
+          - --statsd.mapping-config=/etc/statsd-exporter/mappings.yml
+          image: quay.io/prometheus/statsd-exporter:v0.26.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /metrics
+              port: 9102
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: statsd
+          ports:
+          - containerPort: 9125
+            name: statsd-ingest
+            protocol: UDP
+          - containerPort: 9102
+            name: statsd-scrape
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /metrics
+              port: 9102
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /etc/statsd-exporter/mappings.yml
+            name: config
+            subPath: mappings.yml
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          runAsUser: 65534
+        serviceAccount: airflow-statsd
+        serviceAccountName: airflow-statsd
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: airflow-statsd
+          name: config
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    annotations:
+      deployment.kubernetes.io/desired-replicas: "1"
+      deployment.kubernetes.io/max-replicas: "2"
+      deployment.kubernetes.io/revision: "1"
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    generation: 1
+    labels:
+      component: webserver
+      pod-template-hash: 79f4b5d484
+      release: airflow
+      tier: airflow
+    name: airflow-webserver-79f4b5d484
+    namespace: airflow
+    ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: airflow-webserver
+      uid: 373e845d-69a4-4027-bbcf-98c1fe29e146
+    resourceVersion: "16572137"
+    uid: db55936d-db59-4377-9566-69ee435365ab
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        component: webserver
+        pod-template-hash: 79f4b5d484
+        release: airflow
+        tier: airflow
+    template:
+      metadata:
+        annotations:
+          checksum/airflow-config: a10719d9a45aa4eda8692b8e125a56e47f48ed38be9d374ade58ddb39a0ef611
+          checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
+          checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
+          checksum/metadata-secret: 1527346545415bf13f4c9ad69470086eb90d854f2b83594d78ec1badb5e13eb0
+          checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
+          checksum/webserver-config: 2f3fdfd294a37094d2abee43b2b09888a5c195ee03414996bf99a4681658af94
+          checksum/webserver-secret-key: 468eda248041191a251689c78ff9c1693ba840f5799dc03dae2c9245bf3da1be
+        creationTimestamp: null
+        labels:
+          component: webserver
+          pod-template-hash: 79f4b5d484
+          release: airflow
+          tier: airflow
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    component: webserver
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - args:
+          - bash
+          - -c
+          - exec airflow webserver
+          env:
+          - name: AIRFLOW__CORE__FERNET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: fernet-key
+                name: airflow-fernet-key
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW_CONN_AIRFLOW_DB
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__WEBSERVER__SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: webserver-secret-key
+                name: airflow-webserver-secret-key
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: webserver
+          ports:
+          - containerPort: 8080
+            name: airflow-ui
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          startupProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 20
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/pod_templates/pod_template_file.yaml
+            name: config
+            readOnly: true
+            subPath: pod_template_file.yaml
+          - mountPath: /opt/airflow/airflow.cfg
+            name: config
+            readOnly: true
+            subPath: airflow.cfg
+          - mountPath: /opt/airflow/config/airflow_local_settings.py
+            name: config
+            readOnly: true
+            subPath: airflow_local_settings.py
+          - mountPath: /opt/airflow/logs
+            name: logs
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - airflow
+          - db
+          - check-migrations
+          - --migration-wait-timeout=60
+          env:
+          - name: AIRFLOW__CORE__FERNET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: fernet-key
+                name: airflow-fernet-key
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW_CONN_AIRFLOW_DB
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__WEBSERVER__SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: webserver-secret-key
+                name: airflow-webserver-secret-key
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          name: wait-for-airflow-migrations
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/airflow.cfg
+            name: config
+            readOnly: true
+            subPath: airflow.cfg
+          - mountPath: /opt/airflow/config/airflow_local_settings.py
+            name: config
+            readOnly: true
+            subPath: airflow_local_settings.py
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 0
+          runAsUser: 50000
+        serviceAccount: airflow-webserver
+        serviceAccountName: airflow-webserver
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: airflow-config
+          name: config
+        - name: logs
+          persistentVolumeClaim:
+            claimName: airflow-logs
+  status:
+    availableReplicas: 1
+    fullyLabeledReplicas: 1
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/component: primary
+      app.kubernetes.io/instance: airflow
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/version: 16.1.0
+      helm.sh/chart: postgresql-13.2.24
+    name: airflow-postgresql
+    namespace: airflow
+    resourceVersion: "16572055"
+    uid: e80d93d3-a412-439a-ac8c-955061e4d6b3
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: primary
+        app.kubernetes.io/instance: airflow
+        app.kubernetes.io/name: postgresql
+    serviceName: airflow-postgresql-hl
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app.kubernetes.io/component: primary
+          app.kubernetes.io/instance: airflow
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/name: postgresql
+          app.kubernetes.io/version: 16.1.0
+          helm.sh/chart: postgresql-13.2.24
+        name: airflow-postgresql
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/component: primary
+                    app.kubernetes.io/instance: airflow
+                    app.kubernetes.io/name: postgresql
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        containers:
+        - env:
+          - name: BITNAMI_DEBUG
+            value: "false"
+          - name: POSTGRESQL_PORT_NUMBER
+            value: "5432"
+          - name: POSTGRESQL_VOLUME_DIR
+            value: /bitnami/postgresql
+          - name: PGDATA
+            value: /bitnami/postgresql/data
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: postgres-password
+                name: airflow-postgresql
+          - name: POSTGRESQL_ENABLE_LDAP
+            value: "no"
+          - name: POSTGRESQL_ENABLE_TLS
+            value: "no"
+          - name: POSTGRESQL_LOG_HOSTNAME
+            value: "false"
+          - name: POSTGRESQL_LOG_CONNECTIONS
+            value: "false"
+          - name: POSTGRESQL_LOG_DISCONNECTIONS
+            value: "false"
+          - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
+            value: "off"
+          - name: POSTGRESQL_CLIENT_MIN_MESSAGES
+            value: error
+          - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
+            value: pgaudit
+          image: docker.io/bitnami/postgresql:16.1.0-debian-11-r15
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: postgresql
+          ports:
+          - containerPort: 5432
+            name: tcp-postgresql
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - -e
+              - |
+                exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+                [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+            failureThreshold: 6
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /dev/shm
+            name: dshm
+          - mountPath: /bitnami/postgresql
+            name: data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 1001
+        serviceAccount: default
+        serviceAccountName: default
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir:
+            medium: Memory
+          name: dshm
+    updateStrategy:
+      rollingUpdate:
+        partition: 0
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        creationTimestamp: null
+        name: data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 8Gi
+        volumeMode: Filesystem
+      status:
+        phase: Pending
+  status:
+    availableReplicas: 1
+    collisionCount: 0
+    currentReplicas: 1
+    currentRevision: airflow-postgresql-59f5bcc96d
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updateRevision: airflow-postgresql-59f5bcc96d
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: triggerer
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-triggerer
+    namespace: airflow
+    resourceVersion: "16572049"
+    uid: e0b62411-e494-4e89-89f3-cdccd2b2743e
+  spec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    podManagementPolicy: OrderedReady
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        component: triggerer
+        release: airflow
+        tier: airflow
+    serviceName: airflow-triggerer
+    template:
+      metadata:
+        annotations:
+          checksum/airflow-config: a10719d9a45aa4eda8692b8e125a56e47f48ed38be9d374ade58ddb39a0ef611
+          checksum/extra-configmaps: e862ea47e13e634cf17d476323784fa27dac20015550c230953b526182f5cac8
+          checksum/extra-secrets: e9582fdd622296c976cbc10a5ba7d6702c28a24fe80795ea5b84ba443a56c827
+          checksum/metadata-secret: 1527346545415bf13f4c9ad69470086eb90d854f2b83594d78ec1badb5e13eb0
+          checksum/pgbouncer-config-secret: 1dae2adc757473469686d37449d076b0c82404f61413b58ae68b3c5e99527688
+          cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        creationTimestamp: null
+        labels:
+          component: triggerer
+          release: airflow
+          tier: airflow
+      spec:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    component: triggerer
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+        containers:
+        - args:
+          - bash
+          - -c
+          - exec airflow triggerer
+          env:
+          - name: AIRFLOW__CORE__FERNET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: fernet-key
+                name: airflow-fernet-key
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW_CONN_AIRFLOW_DB
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__WEBSERVER__SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: webserver-secret-key
+                name: airflow-webserver-secret-key
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - |
+                CONNECTION_CHECK_MAX_COUNT=0 AIRFLOW__LOGGING__LOGGING_LEVEL=ERROR exec /entrypoint \
+                airflow jobs check --job-type TriggererJob --local
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 20
+          name: triggerer
+          ports:
+          - containerPort: 8794
+            name: triggerer-logs
+            protocol: TCP
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/logs
+            name: logs
+          - mountPath: /opt/airflow/airflow.cfg
+            name: config
+            readOnly: true
+            subPath: airflow.cfg
+          - mountPath: /opt/airflow/config/airflow_local_settings.py
+            name: config
+            readOnly: true
+            subPath: airflow_local_settings.py
+          - mountPath: /opt/airflow/dags
+            name: dags
+        - args:
+          - bash
+          - /clean-logs
+          env:
+          - name: AIRFLOW__LOG_RETENTION_DAYS
+            value: "15"
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          name: triggerer-log-groomer
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/logs
+            name: logs
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - args:
+          - airflow
+          - db
+          - check-migrations
+          - --migration-wait-timeout=60
+          env:
+          - name: AIRFLOW__CORE__FERNET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: fernet-key
+                name: airflow-fernet-key
+          - name: AIRFLOW_HOME
+            value: /opt/airflow
+          - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW_CONN_AIRFLOW_DB
+            valueFrom:
+              secretKeyRef:
+                key: connection
+                name: airflow-metadata
+          - name: AIRFLOW__WEBSERVER__SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                key: webserver-secret-key
+                name: airflow-webserver-secret-key
+          image: 172.10.40.178:31130/airflow_src/airflow:1.0
+          imagePullPolicy: IfNotPresent
+          name: wait-for-airflow-migrations
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /opt/airflow/airflow.cfg
+            name: config
+            readOnly: true
+            subPath: airflow.cfg
+          - mountPath: /opt/airflow/config/airflow_local_settings.py
+            name: config
+            readOnly: true
+            subPath: airflow_local_settings.py
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 0
+          runAsUser: 50000
+        serviceAccount: airflow-triggerer
+        serviceAccountName: airflow-triggerer
+        terminationGracePeriodSeconds: 60
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: airflow-config
+          name: config
+        - name: dags
+          persistentVolumeClaim:
+            claimName: airflow-dags
+        - name: logs
+          persistentVolumeClaim:
+            claimName: airflow-logs
+    updateStrategy:
+      rollingUpdate:
+        partition: 0
+      type: RollingUpdate
+  status:
+    availableReplicas: 1
+    collisionCount: 0
+    currentReplicas: 1
+    currentRevision: airflow-triggerer-79766475d
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    updateRevision: airflow-triggerer-79766475d
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

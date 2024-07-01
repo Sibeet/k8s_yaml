@@ -1,0 +1,64 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: main
+  namespace: thanos 
+spec:
+  version: v2.43.1
+  serviceAccountName: prometheus
+  retention: 1d
+  enableAdminAPI: true
+  additionalScrapeConfigs:
+    name: scrape-configs
+    key: scrape.config
+  podMonitorSelector:
+    matchLabels:
+      prometheus: main
+  podMonitorNamespaceSelector:
+    matchLabels:
+      thanos: prometheus
+  serviceMonitorSelector:
+    matchLabels:
+      prometheus: main
+  serviceMonitorNamespaceSelector:
+    matchLabels:
+      thanos: prometheus
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 3Gi
+  replicas: 1
+  logLevel: info
+  logFormat: logfmt
+  scrapeInterval: 15s
+  securityContext:
+    fsGroup: 0
+    runAsNonRoot: false
+    runAsUser: 0
+  volumeMounts:
+    - name: prometheus-storage
+      mountPath: /mnt/thanos_prometheus-pv
+  volumes:
+    - name: prometheus-storage
+      persistentVolumeClaim:
+        claimName: thanos-prometheus-pvc
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: nfs-client
+        resources:
+          requests:
+            storage: 50Gi
+
+  # START: Deployed Thanos Sidecar
+  thanos:
+    version: v0.31.0
+    objectStorageConfig:
+      name: objstore
+      key: objstore.yml
+    # END: Deployed Thanos Sidecar

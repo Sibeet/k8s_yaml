@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-exporter
+  namespace: kube-system
+  labels:
+    app: event-exporter
+    monitor: exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-exporter
+      monitor: exporter
+  template:
+    metadata:
+      labels:
+        app: event-exporter
+        monitor: exporter
+    spec:
+      containers:
+      - name: event-exporter
+        image: caicloud/event-exporter:latest
+        ports:
+        - containerPort: 9102
+          name: http
+        volumeMounts:
+        - name: kube-config-volume
+          mountPath: /etc/kube-config
+          subPath: config
+        args:
+        - "--kubeConfigPath=/etc/kube-config"
+      volumes:
+      - name: kube-config-volume
+        secret:
+          secretName: kube-config

@@ -1,0 +1,146 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  automountServiceAccountToken: true
+  kind: ServiceAccount
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: create-user-job
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-create-user-job
+    namespace: airflow
+    resourceVersion: "14942325"
+    uid: 573566af-824e-4321-9242-73f124734f23
+- apiVersion: v1
+  automountServiceAccountToken: true
+  kind: ServiceAccount
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: run-airflow-migrations
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-migrate-database-job
+    namespace: airflow
+    resourceVersion: "14942326"
+    uid: 17a37d6d-7354-4e74-9125-2be2407e1e6f
+- apiVersion: v1
+  automountServiceAccountToken: true
+  kind: ServiceAccount
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: scheduler
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-scheduler
+    namespace: airflow
+    resourceVersion: "14942322"
+    uid: 996eedb6-af68-48ef-907e-741c13654d7c
+- apiVersion: v1
+  automountServiceAccountToken: true
+  kind: ServiceAccount
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: statsd
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-statsd
+    namespace: airflow
+    resourceVersion: "14942328"
+    uid: 1da761d7-8dd0-4bb8-83d2-4e9db8015b74
+- apiVersion: v1
+  automountServiceAccountToken: true
+  kind: ServiceAccount
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: triggerer
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-triggerer
+    namespace: airflow
+    resourceVersion: "14942323"
+    uid: c08fe361-c248-49f2-824a-732c678e5383
+- apiVersion: v1
+  automountServiceAccountToken: true
+  kind: ServiceAccount
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: webserver
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-webserver
+    namespace: airflow
+    resourceVersion: "14942324"
+    uid: 87d58c0c-ff69-4168-b1b5-55142a7a9c40
+- apiVersion: v1
+  automountServiceAccountToken: true
+  kind: ServiceAccount
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: worker
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-worker
+    namespace: airflow
+    resourceVersion: "14942327"
+    uid: 58a817eb-24b2-4e46-bba4-2c3ad067228f
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    creationTimestamp: "2024-05-22T07:35:59Z"
+    name: default
+    namespace: airflow
+    resourceVersion: "14942290"
+    uid: ffe24313-e814-4219-a265-37282a334f21
+kind: List
+metadata:
+  resourceVersion: ""

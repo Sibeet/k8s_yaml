@@ -1,0 +1,172 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  data:
+    airflow.cfg: "[celery]\nflower_url_prefix = \nworker_concurrency = 16\n\n[celery_kubernetes_executor]\nkubernetes_queue
+      = kubernetes\n\n[core]\ncolored_console_log = False\ndags_folder = /opt/airflow/dags\nexecutor
+      = KubernetesExecutor\nload_examples = False\nremote_logging = False\n\n[elasticsearch]\njson_format
+      = True\nlog_id_template = {dag_id}_{task_id}_{execution_date}_{try_number}\n\n[elasticsearch_configs]\nmax_retries
+      = 3\nretry_timeout = True\ntimeout = 30\n\n[kerberos]\nccache = /var/kerberos-ccache/cache\nkeytab
+      = /etc/airflow.keytab\nprincipal = airflow@FOO.COM\nreinit_frequency = 3600\n\n[kubernetes]\nairflow_configmap
+      = airflow-config\nairflow_local_settings_configmap = airflow-config\nmulti_namespace_mode
+      = False\nnamespace = airflow\npod_template_file = /opt/airflow/pod_templates/pod_template_file.yaml\nworker_container_repository
+      = 172.10.40.178:31130/airflow_src/airflow\nworker_container_tag = 1.0\n\n[kubernetes_executor]\nmulti_namespace_mode
+      = False\nnamespace = airflow\npod_template_file = /opt/airflow/pod_templates/pod_template_file.yaml\nworker_container_repository
+      = 172.10.40.178:31130/airflow_src/airflow\nworker_container_tag = 1.0\n\n[logging]\ncolored_console_log
+      = False\nremote_logging = False\n\n[metrics]\nstatsd_host = airflow-statsd\nstatsd_on
+      = True\nstatsd_port = 9125\nstatsd_prefix = airflow\n\n[scheduler]\nrun_duration
+      = 41460\nstandalone_dag_processor = False\nstatsd_host = airflow-statsd\nstatsd_on
+      = True\nstatsd_port = 9125\nstatsd_prefix = airflow\n\n[triggerer]\ndefault_capacity
+      = 1000\n\n[webserver]\nenable_proxy_fix = True\nrbac = True"
+    airflow_local_settings.py: |2-
+
+      from airflow.www.utils import UIAlert
+
+      DASHBOARD_UIALERTS = [
+        UIAlert(
+          'Usage of a dynamic webserver secret key detected. We recommend a static webserver secret key instead.'
+          ' See the <a href='
+          '"https://airflow.apache.org/docs/helm-chart/stable/production-guide.html#webserver-secret-key">'
+          'Helm Chart Production Guide</a> for more details.',
+          category="warning",
+          roles=["Admin"],
+          html=True,
+        )
+      ]
+    pod_template_file.yaml: "\n---\napiVersion: v1\nkind: Pod\nmetadata:\n  name:
+      placeholder-name\n  labels:\n    tier: airflow\n    component: worker\n    release:
+      airflow\nspec:\n  containers:\n    - envFrom:      \n        []\n      env:\n
+      \       - name: AIRFLOW__CORE__EXECUTOR\n          value: LocalExecutor      \n
+      \       # Hard Coded Airflow Envs\n        - name: AIRFLOW__CORE__FERNET_KEY\n
+      \         valueFrom:\n            secretKeyRef:\n              name: airflow-fernet-key\n
+      \             key: fernet-key\n        - name: AIRFLOW_HOME\n          value:
+      /opt/airflow\n        # For Airflow <2.3, backward compatibility; moved to [database]
+      in 2.3\n        - name: AIRFLOW__CORE__SQL_ALCHEMY_CONN\n          valueFrom:\n
+      \           secretKeyRef:\n              name: airflow-metadata\n              key:
+      connection\n        - name: AIRFLOW__DATABASE__SQL_ALCHEMY_CONN\n          valueFrom:\n
+      \           secretKeyRef:\n              name: airflow-metadata\n              key:
+      connection\n        - name: AIRFLOW_CONN_AIRFLOW_DB\n          valueFrom:\n
+      \           secretKeyRef:\n              name: airflow-metadata\n              key:
+      connection\n        - name: AIRFLOW__WEBSERVER__SECRET_KEY\n          valueFrom:\n
+      \           secretKeyRef:\n              name: airflow-webserver-secret-key\n
+      \             key: webserver-secret-key      \n        # Dynamically created
+      environment variables\n        # Dynamically created secret envs\n        \n
+      \       # Extra env      \n      image: apache/airflow:2.8.3\n      imagePullPolicy:
+      IfNotPresent\n      securityContext: \n        allowPrivilegeEscalation: false\n
+      \       capabilities:\n          drop:\n            - ALL\n      name: base\n
+      \     resources:\n        {}\n      volumeMounts:\n        - mountPath: \"/opt/airflow/logs\"\n
+      \         name: logs\n        - name: config\n          mountPath: \"/opt/airflow/airflow.cfg\"\n
+      \         subPath: airflow.cfg\n          readOnly: true\n        - name: config\n
+      \         mountPath: \"/opt/airflow/config/airflow_local_settings.py\"\n          subPath:
+      airflow_local_settings.py\n          readOnly: true\n        - name: dags\n
+      \         mountPath: /opt/airflow/dags\n          readOnly: False\n  restartPolicy:
+      Never\n  securityContext: \n    runAsUser: 50000\n    fsGroup: 0\n  nodeSelector:\n
+      \   {}\n  affinity:\n    {}\n  terminationGracePeriodSeconds: 600\n  tolerations:\n
+      \   []\n  topologySpreadConstraints:\n    []\n  serviceAccountName: airflow-worker\n
+      \ volumes:\n  - name: dags\n    persistentVolumeClaim:\n      claimName: airflow-dags\n
+      \ - name: logs\n    persistentVolumeClaim:\n      claimName: airflow-logs\n
+      \ - configMap:\n      name: airflow-config\n    name: config"
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: config
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-config
+    namespace: airflow
+    resourceVersion: "14942333"
+    uid: 0f65719c-4faa-4f4a-9780-1eba8a740920
+- apiVersion: v1
+  data:
+    mappings.yml: "# Licensed to the Apache Software Foundation (ASF) under one\n#
+      or more contributor license agreements.  See the NOTICE file\n# distributed
+      with this work for additional information\n# regarding copyright ownership.
+      \ The ASF licenses this file\n# to you under the Apache License, Version 2.0
+      (the\n# \"License\"); you may not use this file except in compliance\n# with
+      the License.  You may obtain a copy of the License at\n#\n#   http://www.apache.org/licenses/LICENSE-2.0\n#\n#
+      Unless required by applicable law or agreed to in writing,\n# software distributed
+      under the License is distributed on an\n# \"AS IS\" BASIS, WITHOUT WARRANTIES
+      OR CONDITIONS OF ANY\n# KIND, either express or implied.  See the License for
+      the\n# specific language governing permissions and limitations\n# under the
+      License.\n---\n# \nmappings:\n  # Map dot separated stats to labels\n  - match:
+      airflow.dagrun.dependency-check.*.*\n    name: \"airflow_dagrun_dependency_check\"\n
+      \   labels:\n      dag_id: \"$1\"\n\n  - match: airflow.operator_successes_(.*)\n
+      \   match_type: regex\n    name: \"airflow_operator_successes\"\n    labels:\n
+      \     operator: \"$1\"\n\n  - match: airflow.operator_failures_(.*)\n    match_type:
+      regex\n    name: \"airflow_operator_failures\"\n    labels:\n      operator:
+      \"$1\"\n\n  - match: airflow.scheduler_heartbeat\n    match_type: regex\n    name:
+      \"airflow_scheduler_heartbeat\"\n    labels:\n      type: counter\n\n  - match:
+      airflow.dag.*.*.duration\n    name: \"airflow_task_duration\"\n    labels:\n
+      \     dag_id: \"$1\"\n      task_id: \"$2\"\n\n  - match: airflow.dagrun.duration.success.*\n
+      \   name: \"airflow_dagrun_duration\"\n    labels:\n      dag_id: \"$1\"\n\n
+      \ - match: airflow.dagrun.duration.failed.*\n    name: \"airflow_dagrun_failed\"\n
+      \   labels:\n      dag_id: \"$1\"\n\n  - match: airflow.dagrun.schedule_delay.*\n
+      \   name: \"airflow_dagrun_schedule_delay\"\n    labels:\n      dag_id: \"$1\"\n\n
+      \ - match: airflow.dag_processing.last_runtime.*\n    name: \"airflow_dag_processing_last_runtime\"\n
+      \   labels:\n      dag_file: \"$1\"\n\n  - match: airflow.dag_processing.last_run.seconds_ago.*\n
+      \   name: \"airflow_dag_processing_last_run_seconds_ago\"\n    labels:\n      dag_file:
+      \"$1\"\n\n  - match: airflow.pool.open_slots.*\n    name: \"airflow_pool_open_slots\"\n
+      \   labels:\n      pool: \"$1\"\n\n  - match: airflow.pool.used_slots.*\n    name:
+      \"airflow_pool_used_slots\"\n    labels:\n      pool: \"$1\"\n\n  - match: airflow.pool.starving_tasks.*\n
+      \   name: \"airflow_pool_starving_tasks\"\n    labels:\n      pool: \"$1\""
+  kind: ConfigMap
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: airflow
+      meta.helm.sh/release-namespace: airflow
+    creationTimestamp: "2024-05-22T07:36:11Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      chart: airflow-1.13.1
+      component: config
+      heritage: Helm
+      release: airflow
+      tier: airflow
+    name: airflow-statsd
+    namespace: airflow
+    resourceVersion: "14942332"
+    uid: 8f08f8fc-8f96-4fd6-9ae7-354a839d94a9
+- apiVersion: v1
+  data:
+    ca.crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDBTCCAe2gAwIBAgIIQ81+ZtwKzJ4wDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
+      AxMKa3ViZXJuZXRlczAeFw0yNDAyMjcwNzUxMjZaFw0zNDAyMjQwNzU2MjZaMBUx
+      EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+      AoIBAQC3k3xA/ktDRSXFUoURzg9DhCla1S5/LSE3ZXd0yWtpVttn5ZOC6RZbcpdC
+      dtwqYstD08Q9+q7mNjw2237ayyz6i7a733Le1psIWosFCQmR9EWYBrq67yYBE7OE
+      2DpZqhzQ7i+QZpDZyRc9Awh5JsqIXI19ii/Wlh6vWo0E+aoIg5SWS0blO7fsrrLo
+      xHFjTjppdK+/FbI/35nB4UkW6PjLKbE7KDPXxlTK1CO6zEWSqic7xjswZEtM2kid
+      vpPtUOKCQ8nZD05UtfqTmHeKZQjeCBvKMELMkiCrPKLW6guVuVZXPeRwL4nw6PVc
+      8VP0llLhCBAvnK2Lb8alTXi+G9BpAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
+      BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSQ+IJMv69wUXIUNd8RIpTqgI/70TAV
+      BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQCkq3F/byVQ
+      ql4M5f2lTW56DLnnDcaToe9efK2LKVDq+A1RDr+9ceGD2+hrflSZEQSZi/ZCPBy6
+      kKTdK3AY8ZrLMU0LB2dD6tJwldHxpJ768j9Zb45SwUJ0NGY6AR4md2ip3RDzRBQO
+      7PfBQ4JOxaQmVFXRMCLkvGEowL2xWfVNtHzsnioE8fp1RtQ7MIuB5jDGSaY9rMin
+      7TnXVpVJlnrHIigCLmA0Fsu28qF2gLYAuUarTyw9MVYI0ynpzGkR8+XddIWg/rCT
+      eLKDazp+zwAoM3p4bIiFnfH6pzl8JyytCcORtsRIJEvPqDAq4O1QdGBmxmiFzkha
+      BjEqV/FpjmTs
+      -----END CERTIFICATE-----
+  kind: ConfigMap
+  metadata:
+    annotations:
+      kubernetes.io/description: Contains a CA bundle that can be used to verify the
+        kube-apiserver when using internal endpoints such as the internal service
+        IP or kubernetes.default.svc. No other usage is guaranteed across distributions
+        of Kubernetes clusters.
+    creationTimestamp: "2024-05-22T07:35:59Z"
+    name: kube-root-ca.crt
+    namespace: airflow
+    resourceVersion: "14942289"
+    uid: 06519c30-d886-46e9-ace9-d48dd05ccc34
+kind: List
+metadata:
+  resourceVersion: ""

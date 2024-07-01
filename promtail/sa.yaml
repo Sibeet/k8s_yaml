@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  namespace: loki
+  name: promtail-role
+rules:
+- apiGroups: ["*"]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: promtail-rolebinding
+  namespace: loki
+subjects:
+- kind: ServiceAccount
+  name: loki-loki-distributed
+  namespace: loki
+roleRef:
+  kind: ClusterRole
+  name: promtail-role
+  apiGroup: rbac.authorization.k8s.io

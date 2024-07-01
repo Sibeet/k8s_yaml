@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: promtail-daemonset
+  namespace: loki
+  labels:
+    app: promtail
+spec:
+  selector:
+    matchLabels:
+      app: promtail
+  template:
+    metadata:
+      labels:
+        app: promtail
+    spec:
+      serviceAccountName: loki-loki-distributed
+      securityContext:
+        runAsUser: 0
+      containers:
+      - name: promtail
+        image: grafana/promtail
+        args:
+        - "-config.file=/promtail/promtail.yaml"
+        ports:
+        - name: promtail
+          containerPort: 3101
+        volumeMounts:
+        - name: promtail-config
+          mountPath: /promtail
+        - name: promtail-run
+          mountPath: /run/promtail
+        - name: promtail-containers
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+        - name: promtail-pods
+          mountPath: /var/log/pods
+          readOnly: true
+        - name: varlog
+          mountPath: /var/log
+      volumes:
+      - name: promtail-config
+        configMap:
+          defaultMode: 420
+          name: promtail-configmap
+      - name: promtail-run
+        hostPath:
+          path: /run/promtail
+      - name: promtail-containers
+        hostPath:
+          path: /var/lib/docker/containers
+      - name: promtail-pods
+        hostPath:
+          path: /var/log/pods
+      - name: varlog
+        hostPath:
+          path: /var/log
+      - name: runlog
+        emptyDir: {}
